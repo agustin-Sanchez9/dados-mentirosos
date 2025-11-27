@@ -14,32 +14,39 @@ player3 llama mentiroso a player2.
 dados-mentirosos/
 ├── cmd/
 │   └── server/
-│       └── main.go       # Punto de entrada. Solo inicializa y arranca el server.
-├── internal/             # Código privado de tu aplicación (no importable por otros)
-│   ├── game/             # LÓGICA PURA DEL JUEGO (Tu "Core")
-│   │   ├── engine.go     # La máquina de estados del juego (turnos, reglas).
-│   │   ├── player.go     # Structs del jugador (dados, nombre, conexión).
-│   │   └── room.go       # Lógica de la sala y broadcast de mensajes.
-│   ├── handlers/         # CAPA HTTP & WEBSOCKETS
-│   │   ├── http.go       # Handlers para servir el HTML inicial y HTMX.
-│   │   └── ws.go         # Manejo de conexiones WebSocket (Upgrader).
-│   └── templates/        # LÓGICA DE RENDERIZADO
-│       └── renderer.go   # Funciones helpers para parsear y ejecutar templates.
-├── ui/                   # FRONTEND (Archivos estáticos y plantillas)
-│   ├── static/           # Archivos públicos
-│   │   ├── css/          # Tu archivo de Tailwind (output.css).
-│   │   └── js/           # htmx.min.js (o descárgalo de CDN).
-│   └── html/             # TUS PLANTILLAS HTML
-│       ├── base.html     # El esqueleto (<html><head>...).
-│       ├── home.html     # La pantalla de "Crear Sala".
-│       ├── game.html     # La pantalla principal del juego.
-│       └── partials/     # FRAGMENTOS PARA HTMX (Lo más importante)
-│           ├── board.html    # El tablero central (se recarga mucho).
-│           ├── dice.html     # Cómo se ve un dado.
-│           └── controls.html # Botones (Apostar/Mentiroso).
-├── go.mod
-├── go.sum
-└── Makefile              # Comandos para correr el server y compilar CSS.
+│       └── main.go           # Arranca HTTP y Websockets
+├── internal/
+│   ├── game/                 # TU LÓGICA DE NEGOCIO
+│   │   ├── lobby.go          # Crear sala, unir jugador, guardar configs.
+│   │   ├── round.go          # Lógica de apuestas, turnos, mentirosos.
+│   │   └── types.go          # Structs (Room, Player, Config).
+│   └── handlers/             # MANEJADORES DE RUTAS
+│       ├── home.go           # GET /, POST /create, POST /enter
+│       ├── lobby.go          # Websockets del lobby, updates de config.
+│       └── game.go           # Websockets del juego (apuestas).
+├── ui/
+│   ├── static/
+│   │   ├── css/              # Tailwind output
+│   │   └── js/               # htmx.js, ws.js (pequeño script para reconectar)
+│   └── html/
+│       ├── base.html         # <html>, <head>, <body> container principal
+│       ├── pages/            # PANTALLAS COMPLETAS (Los contenedores)
+│       │   ├── home.html     # Pantalla 1: Título y Forms
+│       │   ├── lobby.html    # Pantalla 2: Contenedor del Lobby
+│       │   ├── game.html     # Pantalla 3: Contenedor del Juego
+│       │   └── results.html  # Pantalla 4: Contenedor de Resultados
+│       └── partials/         # COMPONENTES REUTILIZABLES (Lo que HTMX actualiza)
+│           ├── lobby/
+│           │   ├── player_list.html   # Lista de jugadores (se actualiza sola)
+│           │   ├── config_host.html   # Inputs activados (Solo para el Creador)
+│           │   └── config_guest.html  # Solo texto/iconos (Para los demás)
+│           ├── game/
+│           │   ├── board_info.html    # "Turno de X", "Apuesta actual"
+│           │   ├── my_hand.html       # Mis dados (Botones 1-6 o imágenes)
+│           │   └── controls.html      # Formulario de apuesta o botón "Mentiroso"
+│           └── results/
+│               └── scoreboard.html    # La tabla de quien tenía qué
+└── go.mod
 ```
 
 ## Cuestiones basicas
