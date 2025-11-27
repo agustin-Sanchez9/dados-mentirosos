@@ -10,6 +10,7 @@ player2 apuesta a 5 - 3.
 player3 llama mentiroso a player2.
 
 ## Estructura del proyecto:
+```text
 dados-mentirosos/
 ├── cmd/
 │   └── server/
@@ -39,7 +40,7 @@ dados-mentirosos/
 ├── go.mod
 ├── go.sum
 └── Makefile              # Comandos para correr el server y compilar CSS.
-
+```
 
 ## Cuestiones basicas
 - El juego no requerira que las personas deban crear una cuenta ni iniciar sesion, tan solo se les pedira que ingresen un nombre para ser reconocido por los demas. Este nombre puede ser lo que las personas quieren.
