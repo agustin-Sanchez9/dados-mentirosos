@@ -86,7 +86,7 @@ func (r *Room) StartGame(playerID string) error {
 		return errors.New("solo el host puede iniciar la partida")
 	}
 
-	if len(r.Players) < 2 {
+	if len(r.Players) < 1 {
 		return errors.New("no hay suficientes jugadores para comenzar")
 	}
 

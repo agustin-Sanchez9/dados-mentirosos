@@ -1,0 +1,24 @@
+{{define "content"}}
+<div class="text-center" hx-ext="ws" ws-connect="/ws/{{.RoomID}}">
+    
+    <h1 class="text-2xl text-green-400">Sala de Espera (Lobby)</h1>
+    <p class="text-xl mt-4">Código: <span class="font-bold text-yellow-400 text-3xl">{{.RoomID}}</span></p>
+    
+    <div class="mt-8 p-4 bg-slate-800 rounded w-96 mx-auto text-left">
+        <h2 class="text-lg mb-4 text-slate-300 border-b border-slate-600 pb-2">Jugadores:</h2>
+        
+        <ul id="players-list" class="space-y-2">
+            <li class="text-slate-500 italic">Conectando...</li>
+        </ul>
+    </div>
+
+    <div class="mt-8">
+        <p class="text-sm text-slate-400 mb-2">Configuraciones (Próximamente)</p>
+        <button hx-post="/game/start?roomID={{.RoomID}}" 
+                 hx-swap="none"
+                class="mt-8 bg-blue-600 px-6 py-2 rounded font-bold hover:bg-blue-500 transition">
+            Comenzar Juego
+        </button>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,41 @@
+{{define "content"}}
+<div class="bg-slate-800 p-8 rounded-lg shadow-xl w-96 text-center">
+    <h1 class="text-3xl font-bold mb-6">🎲 Dados Mentirosos</h1>
+    
+    <form action="/create-room" method="POST" class="flex flex-col gap-4 border-b border-slate-600 pb-6">
+        <h2 class="text-lg text-blue-400 font-bold text-left">Nueva Partida</h2>
+        <input type="text" name="player_name" placeholder="Tu Nombre" required
+               class="p-2 rounded bg-slate-700 border border-slate-600 focus:outline-none focus:border-blue-500">
+        
+        <button type="submit" 
+                class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition">
+            Crear Sala
+        </button>
+    </form>
+    
+    <form action="/join-room" method="POST" class="flex flex-col gap-4 mt-6">
+        <h2 class="text-lg text-green-400 font-bold text-left">Unirse a Partida</h2>
+        
+        <input type="text" name="player_name" placeholder="Tu Nombre" required
+               class="p-2 rounded bg-slate-700 border border-slate-600 focus:outline-none focus:border-green-500">
+
+        <div class="flex gap-2">
+            <input type="text" name="room_id" placeholder="Código (Ej: A1B2)" required
+                   class="p-2 rounded bg-slate-700 border border-slate-600 w-full focus:outline-none focus:border-green-500 uppercase">
+            
+            <button type="submit" class="bg-green-600 hover:bg-green-500 text-white font-bold px-4 rounded transition">
+                Entrar
+            </button>
+        </div>
+    </form>
+
+    <div id="error-msg" class="text-red-400 mt-4 text-sm hidden">
+        Error: Sala no encontrada o llena.
+    </div>
+    <script>
+        if (window.location.search.includes("error")) {
+            document.getElementById("error-msg").classList.remove("hidden");
+        }
+    </script>
+</div>
+{{end}}
