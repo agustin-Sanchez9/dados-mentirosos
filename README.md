@@ -21,9 +21,8 @@ dados-mentirosos/
 │   │   ├── round.go          # Lógica de apuestas, turnos, mentirosos.
 │   │   └── types.go          # Structs (Room, Player, Config).
 │   └── handlers/             # MANEJADORES DE RUTAS
-│       ├── home.go           # GET /, POST /create, POST /enter
-│       ├── lobby.go          # Websockets del lobby, updates de config.
-│       └── game.go           # Websockets del juego (apuestas).
+│       ├── http.go           # GET /, POST /create, POST /enter
+│       └── ws.go             # Websockets del juego.
 ├── ui/
 │   ├── static/
 │   │   ├── css/              # Tailwind output
