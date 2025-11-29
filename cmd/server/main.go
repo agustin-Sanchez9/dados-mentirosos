@@ -33,6 +33,8 @@ func main() {
 	r.Get("/room/{roomID}", gameHandler.Room)
 	r.Post("/game/start", wsHandler.HandleStartGame)
 	r.Post("/game/bet", wsHandler.HandleBet)
+	r.Post("/game/liar", wsHandler.HandleLiar)
+	r.Post("/game/restart", wsHandler.HandleRestart)
 
 	// Rutas WS
 	r.Get("/ws/{roomID}", wsHandler.HandleRequest)

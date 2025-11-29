@@ -43,4 +43,17 @@ type Room struct {
 	State RoundState
 	Status string // "WAITING", "PLAYING", "FINISHED"
 	rng *rand.Rand
+	LastResult *GameResult
+}
+
+// GameResult contiene los datos finales para mostrar en la pantalla de resultados
+type GameResult struct {
+	AccuserID    string // El que dijo "Mentiroso"
+	BlufferID    string // El que hizo la apuesta (el acusado)
+	BetQuantity  int
+	BetFace      int
+	RealCount    int
+	IsLiar       bool   // True = Bluffer pierde, False = Accuser pierde
+	WinnerID     string
+	LoserID      string
 }

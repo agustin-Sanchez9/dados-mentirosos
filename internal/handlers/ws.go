@@ -142,11 +142,11 @@ func (h *WSHandler) StartGameAndBroadcast(roomID string) error {
 	if err != nil {
 		return err
 	}
-	h.broadcatsGameState(roomID)
+	h.broadcastGameState(roomID)
 	return nil
 }
 
-func (h *WSHandler) broadcatsGameState(roomID string) {
+func (h *WSHandler) broadcastGameState(roomID string) {
 	room, err := h.Manager.GetRoom(roomID)
 	if err != nil {
 		return
@@ -160,15 +160,28 @@ func (h *WSHandler) broadcatsGameState(roomID string) {
 		}
 
 		playerID, _ := s.Get("playerID")
-		htmlState := h.generateGameScreenHTML(room, playerID.(string))
+		var htmlState string
+		switch room.Status{
+			case "WAITING":
+				htmlState = h.generateLobbyHTML(room)
+			case "FINISHED":
+				htmlState = h.generateResultsHTML(room, playerID.(string))
+			case "PLAYING":
+				htmlState = h.generateGameScreenHTML(room, playerID.(string))
+		}
 		s.Write([]byte(htmlState))
 	}
 }
 
 // Helper para rellenar la plantilla
 func (h *WSHandler) generateGameScreenHTML(room *game.Room, myPlayerID string) string {
-	// 1. Preparar datos
+	
 	me := room.Players[myPlayerID]
+
+	if room.Status == "FINISHED" && room.LastResult != nil {
+		return h.generateResultsHTML(room, myPlayerID)
+	}
+
 
 	currentPlayerName := "???"
 	if p, ok := room.Players[room.State.CurrentPlayerID]; ok {
@@ -232,7 +245,78 @@ func (h *WSHandler) generateGameScreenHTML(room *game.Room, myPlayerID string) s
 	return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML">%s</div>`, out.String())
 }
 
-// En internal/handlers/ws.go
+func (h *WSHandler) generateResultsHTML(room *game.Room, myPlayerID string) string {
+    // Debug: Avisar que intentamos generar resultados
+    fmt.Printf("🎨 Generando pantalla de resultados para %s...\n", myPlayerID)
+
+    playersList := make([]*game.Player, 0)
+    for _, p := range room.Players {
+        playersList = append(playersList, p)
+    }
+
+    funcMap := template.FuncMap{
+        "toInt": func(i interface{}) int {
+            switch v := i.(type) {
+            case game.Dice:
+                return int(v)
+            case int:
+                return v
+            default:
+                return 0
+            }
+        },
+    }
+    data := map[string]interface{}{
+        "RoomID":  room.ID,
+        "MyID":    myPlayerID,
+        "Result":  room.LastResult,
+        "Players": playersList,
+        "IsHost":  room.Players[myPlayerID].IsHost,
+    }
+
+    // Asegurarse de que la ruta es correcta
+    files := []string{"ui/html/partials/game/results.html"}
+    
+    // Parsear
+    tmpl, err := template.New("results_screen").Funcs(funcMap).ParseFiles(files...)
+    if err != nil {
+        // ERROR CRÍTICO 1: No se encontró el archivo o falló el parseo
+        fmt.Printf("❌ ERROR ParseFiles Results: %v\n", err)
+        return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML" class="bg-red-900 p-4 text-white">ERROR TEMPLATE: %v</div>`, err)
+    }
+
+    var out strings.Builder
+    err = tmpl.ExecuteTemplate(&out, "results_screen", data)
+    if err != nil {
+        // ERROR CRÍTICO 2: Falló al ejecutar (variable faltante, función mal llamada)
+        fmt.Printf("❌ ERROR ExecuteTemplate Results: %v\n", err)
+        return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML" class="bg-red-900 p-4 text-white">ERROR EXEC: %v</div>`, err)
+    }
+
+    fmt.Println("✅ HTML Resultados generado correctamente")
+    return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML">%s</div>`, out.String())
+}
+
+func (h *WSHandler) generateLobbyHTML(room *game.Room) string {
+	// Reutilizamos el archivo lobby.html que ya creamos
+	files := []string{"ui/html/pages/lobby.html"}
+	
+	tmpl, err := template.ParseFiles(files...)
+	if err != nil {
+		return fmt.Sprintf("Error template lobby: %v", err)
+	}
+
+	data := map[string]interface{}{
+		"RoomID": room.ID,
+	}
+
+	var out strings.Builder
+	err = tmpl.ExecuteTemplate(&out, "content", data)
+	if err != nil {
+		return fmt.Sprintf("Error exec lobby: %v", err)
+	}
+	return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML">%s</div>`, out.String())
+}
 
 func (h *WSHandler) HandleStartGame(w http.ResponseWriter, r *http.Request) {
     // Obtener datos de cookie
@@ -270,7 +354,6 @@ func (h *WSHandler) HandleStartGame(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
 }
 
-
 func (h *WSHandler) HandleBet(w http.ResponseWriter, r *http.Request) {
 	// Identificar al jugador
 	cookie, _ := r.Cookie("player_id")
@@ -298,7 +381,34 @@ func (h *WSHandler) HandleBet(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	h.broadcatsGameState(roomID)
+	h.broadcastGameState(roomID)
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *WSHandler) HandleRestart(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := r.Cookie("player_id")
+	parts := strings.Split(cookie.Value, ":")
+	playerID := parts[0]
+	roomID := r.URL.Query().Get("roomID")
+
+	room, err := h.Manager.GetRoom(roomID)
+	if err != nil {
+		http.Error(w, "Sala no encontrada", http.StatusNotFound)
+		return
+	}
+
+	// Validar que sea Host
+	isHost := false
+	if p, ok := room.Players[playerID]; ok && p.IsHost {
+		isHost = true
+	}
+	if !isHost {
+		http.Error(w, "Solo el host puede reiniciar", http.StatusForbidden)
+		return
+	}
+	room.Reset()
+	h.broadcastGameState(roomID)
+	h.BroadcastPlayerList(roomID)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -306,4 +416,28 @@ func (h *WSHandler) HandleBet(w http.ResponseWriter, r *http.Request) {
 func atoi(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i
+}
+
+func (h *WSHandler) HandleLiar(w http.ResponseWriter, r *http.Request) {
+	// Identificar jugador y sala
+	cookie, _ := r.Cookie("player_id")
+	parts := strings.Split(cookie.Value, ":")
+	playerID := parts[0]
+	roomID := r.URL.Query().Get("roomID")
+
+	room, err := h.Manager.GetRoom(roomID)
+	if err != nil {
+		http.Error(w, "Sala no encontrada", http.StatusNotFound)
+		return
+	}
+
+	_, err = room.CallLiar(playerID)
+	if err != nil {
+		fmt.Printf("Error CallLiar: %v\n", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	h.broadcastGameState(roomID)
+	w.WriteHeader(http.StatusOK)
 }

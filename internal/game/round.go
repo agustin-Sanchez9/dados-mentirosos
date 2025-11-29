@@ -59,25 +59,10 @@ func (r *Room) isValidBet(qty int, face int) bool {
 	return false
 }
 
-// ---Logica de "Mentiroso"---
-
-// GameResult contiene los datos finales para mostrar en la pantalla de resultados
-type GameResult struct {
-	AccuserID    string // El que dijo "Mentiroso"
-	BlufferID    string // El que hizo la apuesta (el acusado)
-	BetQuantity  int
-	BetFace      int
-	RealCount    int
-	IsLiar       bool   // True = Bluffer pierde, False = Accuser pierde
-	WinnerID     string
-	LoserID      string
-}
-
 // CallLiar termina el juego inmediatamente y retorna el resultado.
 func (r *Room) CallLiar(accuserPlayerID string) (*GameResult, error) {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
-
 	if r.State.CurrentPlayerID != accuserPlayerID {
 		return nil, ErrNotYourTurn
 	}
@@ -85,10 +70,9 @@ func (r *Room) CallLiar(accuserPlayerID string) (*GameResult, error) {
 		return nil, ErrNoBetMade
 	}
 
-	// 1. Calcular la realidad
+	// Calcular la realidad
 	targetFace := r.State.CurrentBetFace
 	realCount := 0
-	
 	for _, p := range r.Players {
 		for _, d := range p.Dice {
 			if int(d) == targetFace {
@@ -99,7 +83,7 @@ func (r *Room) CallLiar(accuserPlayerID string) (*GameResult, error) {
 		}
 	}
 
-	// 2. Determinar ganador/perdedor
+	// Determinar ganador y perdedor
 	betQty := r.State.CurrentBetQuantity
 	blufferID := r.State.LastBetPlayerID
 	
@@ -112,7 +96,7 @@ func (r *Room) CallLiar(accuserPlayerID string) (*GameResult, error) {
 		loser = blufferID
 		winner = accuserPlayerID
 	} else {
-		// El acusado se salva. El acusador (que desconfió mal) pierde.
+		// El acusado se salva. El acusador pierde.
 		loser = accuserPlayerID
 		winner = blufferID
 	}
@@ -130,6 +114,8 @@ func (r *Room) CallLiar(accuserPlayerID string) (*GameResult, error) {
 		WinnerID:    winner,
 		LoserID:     loser,
 	}
+
+	r.LastResult = result
 
 	return result, nil
 }

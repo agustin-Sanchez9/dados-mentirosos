@@ -83,7 +83,6 @@ func (r *Room) RemovePlayer(playerID string) {
 	}
 }
 
-
 // StartGame cambia el Status de la partida y prepara la primera ronda
 func (r *Room) StartGame(playerID string) error {
 	r.Mutex.Lock()
@@ -117,4 +116,19 @@ func (r *Room) rollAllDice() {
 	for _, p := range r.Players {
 		r.rollDice(p)
 	}
+}
+
+// Reset devuelve la sala al estado de espera (Lobby)
+func (r *Room) Reset() {
+	r.Mutex.Lock()
+	defer r.Mutex.Unlock()
+
+	r.Status = "WAITING"
+	r.LastResult = nil
+	
+	// Limpiamos el estado de la ronda
+	r.State = RoundState{} 
+	
+	// Limpiamos el orden (se calcula al iniciar de nuevo)
+	r.PlayerOrder = nil
 }
