@@ -1,7 +1,13 @@
 {{define "controls"}}
-<form hx-post="/game/bet" hx-swap="none" class="flex flex-col gap-3">
+<form hx-post="/game/bet?roomID={{.RoomID}}" 
+      hx-swap="none" 
+      class="flex flex-col gap-3">
+    
+    <div id="bet-error" class="text-red-500 text-xs text-center font-bold"></div>
+
     {{if gt .CurrentBetQty 0}}
-        <button hx-post="/game/liar" 
+        <button hx-post="/game/liar?roomID={{.RoomID}}" 
+                hx-swap="none"
                 class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded uppercase tracking-wider shadow-lg transition transform active:scale-95">
             ¡MENTIROSO!
         </button>
@@ -11,18 +17,20 @@
     <div class="flex gap-2">
         <div class="flex-1">
             <label class="text-xs text-slate-400">Cantidad</label>
-            <input type="number" name="quantity" min="1" value="{{.CurrentBetQty}}" 
-                   class="w-full bg-slate-700 text-white p-2 rounded text-center font-bold text-xl border border-slate-600">
+            <input type="number" name="quantity" min="1" required
+                   value="{{if .CurrentBetQty}}{{.CurrentBetQty}}{{else}}1{{end}}" 
+                   class="w-full bg-slate-700 text-white p-2 rounded text-center font-bold text-xl border border-slate-600 focus:border-yellow-500 outline-none">
         </div>
         <div class="flex-1">
             <label class="text-xs text-slate-400">Cara (1-6)</label>
-            <input type="number" name="face" min="1" max="6" value="{{if .CurrentBetFace}}{{.CurrentBetFace}}{{else}}1{{end}}" 
-                   class="w-full bg-slate-700 text-white p-2 rounded text-center font-bold text-xl border border-slate-600">
+            <input type="number" name="face" min="1" max="6" required
+                   value="{{if .CurrentBetFace}}{{.CurrentBetFace}}{{else}}2{{end}}" 
+                   class="w-full bg-slate-700 text-white p-2 rounded text-center font-bold text-xl border border-slate-600 focus:border-yellow-500 outline-none">
         </div>
     </div>
     
-    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded shadow-lg">
-        APOSTAR
+    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded shadow-lg transition transform active:scale-95">
+        SUBIR APUESTA
     </button>
 </form>
 {{end}}

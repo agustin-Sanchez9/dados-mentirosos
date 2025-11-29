@@ -143,9 +143,7 @@ func (r *Room) CallLiar(accuserPlayerID string) (*GameResult, error) {
 // nextTurn pasa al siguiente en la lista de forma circular
 func (r *Room) nextTurn() {
 	if len(r.PlayerOrder) == 0 {
-		for id := range r.Players {
-			r.PlayerOrder = append(r.PlayerOrder, id)
-		}
+		return // evitar el panic "dividir por cero", manejar error despues?
 	}
 
 	currentIdx := -1
@@ -154,6 +152,12 @@ func (r *Room) nextTurn() {
 			currentIdx = i
 			break
 		}
+	}
+
+	// si no encuentra al actual que empiece del principio, para no usar el -1
+	if currentIdx == -1 {
+		r.State.CurrentPlayerID = r.PlayerOrder[0]
+		return
 	}
 
 	nextIdx := (currentIdx + 1) % len(r.PlayerOrder)

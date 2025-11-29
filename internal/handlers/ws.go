@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -144,6 +145,17 @@ func (h *WSHandler) StartGameAndBroadcast(roomID string) error {
 		return err
 	}
 
+	h.broadcatsGameState(roomID)
+
+	return nil
+}
+
+func (h *WSHandler) broadcatsGameState(roomID string) {
+	room, err := h.Manager.GetRoom(roomID)
+	if err != nil {
+		return
+	}
+
 	sessions, _ := h.Melody.Sessions()
 
 	for _, s := range sessions {
@@ -154,14 +166,10 @@ func (h *WSHandler) StartGameAndBroadcast(roomID string) error {
 
 		playerID, _ := s.Get("playerID")
 
-		// 4. Generar el estado visual para cada jugador
 		htmlState := h.generateGameScreenHTML(room, playerID.(string))
 
-		// 5. Enviar HTML por WS individualmente
 		s.Write([]byte(htmlState))
 	}
-
-	return nil
 }
 
 // Helper para rellenar la plantilla
@@ -267,4 +275,46 @@ func (h *WSHandler) HandleStartGame(w http.ResponseWriter, r *http.Request) {
     }
 
     w.WriteHeader(http.StatusOK)
+}
+
+
+func (h *WSHandler) HandleBet(w http.ResponseWriter, r *http.Request) {
+	// Identificar al jugador
+	cookie, _ := r.Cookie("player_id")
+	parts := strings.Split(cookie.Value, ":")
+	plaryerID := parts[0]
+
+	roomID := r.URL.Query().Get("roomID")
+
+	room, err := h.Manager.GetRoom(roomID)
+	if err != nil {
+		http.Error(w, "sala no encontrada", http.StatusNotFound)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "datos invalidos", http.StatusBadRequest)
+		return
+	}
+
+	quantity := atoi(r.FormValue("quantity"))
+	face := atoi(r.FormValue("face"))
+
+	err = room.PlaceBet(plaryerID, quantity, face)
+	if err != nil {
+		w.Header().Set("HX-Retarget", "#bet-error")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	h.broadcatsGameState(roomID)
+
+	w.WriteHeader(http.StatusOK)
+
+}
+
+// simplificar pasar de string a int
+func atoi(s string) int {
+	i, _ := strconv.Atoi(s)
+	return i
 }

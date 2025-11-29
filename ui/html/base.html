@@ -3,15 +3,21 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados Mentirosos</title>
-    <script src="https://cdn.tailwindcss.com"></script> 
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10/dist/ext/ws.js"></script>
 </head>
 <body class="bg-slate-900 text-white">
-    <div id="content" class="w-full min-h-screen flex items-center justify-center"> 
+    
+    <div id="content" 
+         class="min-h-screen w-full flex items-center justify-center"
+         {{if .RoomID}}hx-ext="ws" ws-connect="/ws/{{.RoomID}}"{{end}}>
+         
         {{template "content" .}}
     </div>
+
 </body>
 </html>
 {{end}}

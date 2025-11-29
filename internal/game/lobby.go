@@ -90,6 +90,12 @@ func (r *Room) StartGame(playerID string) error {
 		return errors.New("no hay suficientes jugadores para comenzar")
 	}
 
+	r.PlayerOrder = make([]string, 0, len(r.Players))
+	for id := range r.Players {
+		r.PlayerOrder = append(r.PlayerOrder, id)
+	}
+
+
 	r.Status = "PLAYING"
 
 	r.State = RoundState{
