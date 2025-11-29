@@ -2,8 +2,6 @@ package game
 
 import (
 	"errors"
-	"math/rand"
-	"time"
 )
 
 var (
@@ -12,18 +10,14 @@ var (
 	ErrNoBetMade    = errors.New("no hay apuesta previa para llamar mentiroso")
 )
 
-// ---Logica de Dados---
-
 // rollDice genera nuevos numeros para un jugador.
 func (r *Room) rollDice(p *Player) {
-	source := rand.NewSource(time.Now().UnixNano())
-	rng := rand.New(source)
 
 	count := r.Config.DicesAmount
 	p.Dice = make([]Dice, count)
 	
 	for i := 0; i < count; i++ {
-		p.Dice[i] = Dice(rng.Intn(6) + 1)
+		p.Dice[i] = Dice(r.rng.Intn(6) + 1) // Intn(6) da 0 a 5, por eso el +1
 	}
 }
 

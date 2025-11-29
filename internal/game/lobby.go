@@ -1,6 +1,10 @@
 package game
 
-import "errors"
+import (
+	"errors"
+	"math/rand"
+	"time"
+)
 
 var (
 	ErrRoomFull = errors.New("la sala esta llena")
@@ -11,11 +15,15 @@ var (
 
 // NewRoom crea una instancia de una sala vacia
 func NewRoom(id string, config GameConfig) *Room {
+	source := rand.NewSource(time.Now().UnixNano())
+	generator := rand.New(source)
+
 	return &Room{
 		ID: id,
 		Config: config,
 		Players: make(map[string]*Player),
 		Status: "WAITING",
+		rng: generator,
 	}
 }
 
@@ -94,31 +102,19 @@ func (r *Room) StartGame(playerID string) error {
 	for id := range r.Players {
 		r.PlayerOrder = append(r.PlayerOrder, id)
 	}
-
-
 	r.Status = "PLAYING"
-
 	r.State = RoundState{
 		CurrentBetQuantity: 0,
 		CurrentBetFace: 0,
 		CurrentPlayerID: playerID, // por ahora el primero sera el host
 	}
-
-	// Falta logica de tirar dados de round.go
 	r.rollAllDice()
-
 	return nil
 }
 
-
-// rollAllDice es un helper interno (privado) para reiniciar los dados de todos.
+// rollAllDice recorre los jugadores y les genera los dados
 func (r *Room) rollAllDice() {
 	for _, p := range r.Players {
-		// Creamos nuevos dados
-		p.Dice = make([]Dice, r.Config.DicesAmount)
-		for i := 0; i < r.Config.DicesAmount; i++ {
-			// Asignamos valor dummy por ahora, en round.go pondremos el random real
-			p.Dice[i] = Dice(1) 
-		}
+		r.rollDice(p)
 	}
 }

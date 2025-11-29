@@ -1,6 +1,9 @@
 package game
 
-import "sync"
+import (
+	"math/rand"
+	"sync"
+)
 
 // Representara un dado (1-6)
 type Dice int
@@ -39,4 +42,5 @@ type Room struct {
 	Config GameConfig
 	State RoundState
 	Status string // "WAITING", "PLAYING", "FINISHED"
+	rng *rand.Rand
 }

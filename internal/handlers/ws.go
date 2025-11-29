@@ -25,8 +25,6 @@ func NewWSHandler(m *melody.Melody, gm *game.GameManager, gh *GameHandler) *WSHa
 		GameH:   gh,
 	}
 
-	// EVENTOS DEL WEBSOCKET
-
 	// Cuando alguien se conecta
 	handler.Melody.HandleConnect(func(s *melody.Session) {
 		// Leemos el RoomID y PlayerID que guardamos en la sesion
@@ -144,9 +142,7 @@ func (h *WSHandler) StartGameAndBroadcast(roomID string) error {
 	if err != nil {
 		return err
 	}
-
 	h.broadcatsGameState(roomID)
-
 	return nil
 }
 
@@ -157,7 +153,6 @@ func (h *WSHandler) broadcatsGameState(roomID string) {
 	}
 
 	sessions, _ := h.Melody.Sessions()
-
 	for _, s := range sessions {
 		sRoomID, exists := s.Get("roomID")
 		if !exists || sRoomID.(string) != roomID {
@@ -165,9 +160,7 @@ func (h *WSHandler) broadcatsGameState(roomID string) {
 		}
 
 		playerID, _ := s.Get("playerID")
-
 		htmlState := h.generateGameScreenHTML(room, playerID.(string))
-
 		s.Write([]byte(htmlState))
 	}
 }
@@ -291,7 +284,6 @@ func (h *WSHandler) HandleBet(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "sala no encontrada", http.StatusNotFound)
 		return
 	}
-
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "datos invalidos", http.StatusBadRequest)
 		return
@@ -306,11 +298,8 @@ func (h *WSHandler) HandleBet(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	h.broadcatsGameState(roomID)
-
 	w.WriteHeader(http.StatusOK)
-
 }
 
 // simplificar pasar de string a int

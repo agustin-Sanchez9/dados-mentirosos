@@ -60,6 +60,7 @@ func (h *GameHandler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	config := game.GameConfig{
 		MaxPlayers: 4,
 		DicesAmount: 5,
+		MinBetIncrement: 1,
 		WildAces: true,
 	}
 
