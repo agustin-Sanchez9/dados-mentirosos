@@ -5,6 +5,7 @@ import (
 	"dados-mentirosos/internal/handlers"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -39,7 +40,12 @@ func main() {
 	// Rutas WS
 	r.Get("/ws/{roomID}", wsHandler.HandleRequest)
 
+	port := os.Getenv("PORT")
+	if port == ""{
+		port = "3000"
+	}
+
 	// Iniciar Servidor
 	fmt.Println("Servidor corriendo en http://localhost:3000")
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":"+port, r)
 }

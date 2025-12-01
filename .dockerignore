@@ -1,0 +1,17 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Archivos de compilación locales o temporales
+bin/
+tmp/
+main.exe
+main
+*.log
+
+# Entornos y configuraciones locales
+.env
