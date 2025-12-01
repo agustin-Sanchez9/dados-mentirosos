@@ -35,6 +35,10 @@
         </ul>
     </div>
 
+    <div class="px-6">
+        {{template "lobby_settings" .}}
+    </div>
+
     <div class="p-6 border-t border-slate-800 bg-slate-800/30">
         <button hx-post="/game/start?roomID={{.RoomID}}" 
                 hx-swap="none"

@@ -58,7 +58,7 @@ func (h *GameHandler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	
 	// Por ahora usamos la default para probar el flujo
 	config := game.GameConfig{
-		MaxPlayers: 4,
+		MaxPlayers: 7,
 		DicesAmount: 5,
 		MinBetIncrement: 1,
 		WildAces: true,

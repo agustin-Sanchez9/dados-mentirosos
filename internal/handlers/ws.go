@@ -441,3 +441,49 @@ func (h *WSHandler) HandleLiar(w http.ResponseWriter, r *http.Request) {
 	h.broadcastGameState(roomID)
 	w.WriteHeader(http.StatusOK)
 }
+
+func (h *WSHandler) HandleUpdateConfig(w http.ResponseWriter, r *http.Request) {
+	// Identificar Host y Sala
+	cookie, _ := r.Cookie("player_id")
+	parts := strings.Split(cookie.Value, ":")
+	playerID := parts[0]
+	roomID := r.URL.Query().Get("roomID")
+
+	room, err := h.Manager.GetRoom(roomID)
+	if err != nil {
+		http.Error(w, "Sala no encontrada", http.StatusNotFound)
+		return
+	}
+
+	// Verificar Permisos
+	isHost := false
+	if p, ok := room.Players[playerID]; ok && p.IsHost {
+		isHost = true
+	}
+	if !isHost {
+		http.Error(w, "Solo el host puede configurar", http.StatusForbidden)
+		return
+	}
+
+	// Procesar Formulario
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Datos inválidos", http.StatusBadRequest)
+		return
+	}
+
+	// Actualizar Configuración (Protegido por Mutex)
+	room.Mutex.Lock()
+	room.Config.DicesAmount = atoi(r.FormValue("initial_dice_count"))
+	room.Config.TurnDuration = atoi(r.FormValue("turn_duration"))
+	room.Config.MinBetIncrement = atoi(r.FormValue("min_bet_increment"))
+	room.Config.WildAces = (r.FormValue("wild_aces") == "on")
+	
+	// Validaciones de seguridad
+	if room.Config.MaxPlayers < 2 { room.Config.MaxPlayers = 2 }
+	if room.Config.DicesAmount < 1 { room.Config.DicesAmount = 5 }
+	if room.Config.MinBetIncrement < 1 { room.Config.MinBetIncrement = 1 }
+	
+	room.Mutex.Unlock()
+	h.broadcastGameState(roomID)
+	w.WriteHeader(http.StatusOK)
+}

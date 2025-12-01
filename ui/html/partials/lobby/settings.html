@@ -1,0 +1,110 @@
+{{define "lobby_settings"}}
+<div id="lobby-settings" class="bg-slate-800/50 rounded-xl p-5 border border-slate-700 mt-6 shadow-inner">
+    
+    <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+        <h3 class="text-xs text-blue-400 uppercase tracking-widest font-bold flex items-center gap-2">
+            ⚙️ Configuración de Mesa
+        </h3>
+        {{if not .IsHost}}
+            <span class="text-[10px] font-bold text-slate-500 bg-slate-900 px-2 py-1 rounded border border-slate-800">
+                🔒 SOLO LECTURA
+            </span>
+        {{end}}
+    </div>
+
+    {{if .IsHost}}
+    <form hx-post="/game/config?roomID={{.RoomID}}" 
+          hx-trigger="change" 
+          hx-swap="none"
+          class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+
+        <div class="flex flex-col gap-1">
+            <label class="text-xs text-slate-400 font-bold ml-1">Dados por Jugador</label>
+            <div class="relative">
+                <select name="initial_dice_count" class="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer hover:bg-slate-800 transition-colors">
+                    <option value="3" {{if eq .Config.InitialDiceCount 3}}selected{{end}}>3 Dados</option>
+                    <option value="4" {{if eq .Config.InitialDiceCount 4}}selected{{end}}>4 Dados</option>
+                    <option value="5" {{if eq .Config.InitialDiceCount 5}}selected{{end}}>5 Dados</option>
+                    <option value="6" {{if eq .Config.InitialDiceCount 6}}selected{{end}}>6 Dados</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <label class="text-xs text-slate-400 font-bold ml-1">Tiempo de Turno</label>
+            <div class="relative">
+                <select name="turn_duration" class="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer hover:bg-slate-800 transition-colors">
+                    <option value="30" {{if eq .Config.TurnDurationSeconds 30}}selected{{end}}>⏱️ 30 Segundos (Blitz)</option>
+                    <option value="60" {{if eq .Config.TurnDurationSeconds 60}}selected{{end}}>⏱️ 60 Segundos (Normal)</option>
+                    <option value="90" {{if eq .Config.TurnDurationSeconds 90}}selected{{end}}>⏱️ 90 Segundos (Relax)</option>
+                    <option value="0"  {{if eq .Config.TurnDurationSeconds 0}}selected{{end}}>♾️ Sin Límite</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col gap-1">
+            <label class="text-xs text-slate-400 font-bold ml-1">Incremento Mínimo</label>
+             <div class="relative">
+                <select name="min_bet_increment" class="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-2.5 text-sm focus:border-blue-500 outline-none appearance-none cursor-pointer">
+                    <option value="1" {{if eq .Config.MinBetIncrement 1}}selected{{end}}>+1 Dado (Estándar)</option>
+                    <option value="2" {{if eq .Config.MinBetIncrement 2}}selected{{end}}>+2 Dados (Difícil)</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-1 md:col-span-2 pt-2 border-t border-slate-700 mt-2">
+            <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-slate-800 transition">
+                <div class="relative flex items-center">
+                    <input type="checkbox" name="wild_aces" class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-500 checked:bg-blue-500 checked:border-blue-500 transition-all" {{if .Config.WildAces}}checked{{end}}>
+                    <svg class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none opacity-0 peer-checked:opacity-100 text-white" viewBox="0 0 14 14" fill="none">
+                        <path d="M3 8L6 11L11 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col select-none">
+                    <span class="text-sm font-bold text-slate-200">Ases Comodines (Wildcards)</span>
+                    <span class="text-[10px] text-slate-500">Si activado, el dado 1 cuenta como cualquier cara.</span>
+                </div>
+            </label>
+        </div>
+    </form>
+
+    {{else}}
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center gap-3">
+            <div class="bg-slate-800 p-2 rounded text-xl">🎲</div>
+            <div>
+                <p class="text-[10px] text-slate-500 uppercase font-bold">Dados Iniciales</p>
+                <p class="text-sm font-bold text-white">{{.Config.InitialDiceCount}}</p>
+            </div>
+        </div>
+        
+        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center gap-3">
+            <div class="bg-slate-800 p-2 rounded text-xl">⏱️</div>
+            <div>
+                <p class="text-[10px] text-slate-500 uppercase font-bold">Tiempo Turno</p>
+                <p class="text-sm font-bold text-white">
+                    {{if eq .Config.TurnDurationSeconds 0}}Sin Límite{{else}}{{.Config.TurnDurationSeconds}}s{{end}}
+                </p>
+            </div>
+        </div>
+        <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center gap-3 col-span-2 md:col-span-3">
+            <div class="bg-slate-800 p-2 rounded text-xl">{{if .Config.WildAces}}🃏{{else}}🚫{{end}}</div>
+            <div>
+                <p class="text-[10px] text-slate-500 uppercase font-bold">Ases Comodines</p>
+                <p class="text-sm font-bold {{if .Config.WildAces}}text-green-400{{else}}text-slate-400{{end}}">
+                    {{if .Config.WildAces}}Activado (Los 1 valen por todo){{else}}Desactivado{{end}}
+                </p>
+            </div>
+        </div>
+    </div>
+    {{end}}
+</div>
+{{end}}
