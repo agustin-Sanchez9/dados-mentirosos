@@ -27,28 +27,38 @@ func (h *GameHandler) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// render es una funcion auxiliar que combina el layout base con la pagina especifica
+// render carga el layout, la pagina solicitada Y los partials necesarios explicitamente
 func (h *GameHandler) render(w http.ResponseWriter, page string, data any) {
-	// Definimos los archivos necesarios: Base + Página específica
 	files := []string{
-		"ui/html/base.html",
-		"ui/html/pages/" + page,
+		"ui/html/base.html",       // El esqueleto
+		"ui/html/pages/" + page,   // La pagina (home.html o lobby.html)
 	}
 
-	// Parseamos los archivos
-	tmpl, err := template.ParseFiles(files...)
+	if page == "lobby.html" {
+		files = append(files, "ui/html/partials/lobby/settings.html")
+	}
+
+	tmpl := template.New("base")
+	
+	// Funciones auxiliares
+	tmpl.Funcs(template.FuncMap{
+		"toInt": func(i any) int { return 0 }, 
+	})
+
+	// Parsear la lista exacta de archivos
+	var err error
+	tmpl, err = tmpl.ParseFiles(files...)
 	if err != nil {
-		http.Error(w, "Error cargando template: "+err.Error(), http.StatusInternalServerError)
+		// Logueamos el error en la terminal para que sepas que archivo falta
+		fmt.Println("❌ Error ParseFiles:", err) 
+		http.Error(w, "Error cargando archivos: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	_, err = tmpl.ParseGlob("ui/html/partials/*/*.html")
-	if err != nil {
-		fmt.Println("Advertencia cargando partials:", err)
-	}
-
+	// Ejecutar
 	err = tmpl.ExecuteTemplate(w, "base", data)
 	if err != nil {
+		fmt.Println("❌ Error ExecuteTemplate:", err)
 		http.Error(w, "Error renderizando: "+err.Error(), http.StatusInternalServerError)
 	}
 }
