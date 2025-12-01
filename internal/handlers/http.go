@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"dados-mentirosos/internal/game"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
@@ -26,12 +27,12 @@ func (h *GameHandler) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// render es una función auxiliar que combina el layout base con la página específica
+// render es una funcion auxiliar que combina el layout base con la pagina especifica
 func (h *GameHandler) render(w http.ResponseWriter, page string, data any) {
 	// Definimos los archivos necesarios: Base + Página específica
 	files := []string{
-		"ui/html/base.html",        // El esqueleto
-		"ui/html/pages/" + page,    // El contenido (ej: home.html)
+		"ui/html/base.html",
+		"ui/html/pages/" + page,
 	}
 
 	// Parseamos los archivos
@@ -41,8 +42,10 @@ func (h *GameHandler) render(w http.ResponseWriter, page string, data any) {
 		return
 	}
 
-	// (Opcional) Parsear partials si los tuviéramos
-	// tmpl.ParseGlob("ui/html/partials/**/*.html")
+	_, err = tmpl.ParseGlob("ui/html/partials/*/*.html")
+	if err != nil {
+		fmt.Println("Advertencia cargando partials:", err)
+	}
 
 	err = tmpl.ExecuteTemplate(w, "base", data)
 	if err != nil {
