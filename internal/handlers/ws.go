@@ -27,25 +27,23 @@ func NewWSHandler(m *melody.Melody, gm *game.GameManager, gh *GameHandler) *WSHa
 
 	// Cuando alguien se conecta
 	handler.Melody.HandleConnect(func(s *melody.Session) {
-		// Leemos el RoomID y PlayerID que guardamos en la sesion
 		roomID := s.MustGet("roomID").(string)
 		playerID := s.MustGet("playerID").(string)
 		playerName := s.MustGet("playerName").(string)
 
 		fmt.Printf("Jugador %s conectado a sala %s\n", playerName, roomID)
 
-		// Se agrega el jugador a la lógica del juego (Room)
 		room, err := handler.Manager.GetRoom(roomID)
 		if err == nil {
-
 			newPlayer := &game.Player{
 				ID:   playerID,
 				Name: playerName,
 			}
 			room.AddPlayer(newPlayer)
 			
-			// Se avisa a TODOS en la sala que actualicen la lista visual
 			handler.BroadcastPlayerList(roomID)
+			htmlState := handler.generateLobbyHTML(room, playerID)
+			s.Write([]byte(htmlState))
 		}
 	})
 
@@ -163,7 +161,7 @@ func (h *WSHandler) broadcastGameState(roomID string) {
 		var htmlState string
 		switch room.Status{
 			case "WAITING":
-				htmlState = h.generateLobbyHTML(room)
+				htmlState = h.generateLobbyHTML(room, playerID.(string))
 			case "FINISHED":
 				htmlState = h.generateResultsHTML(room, playerID.(string))
 			case "PLAYING":
@@ -297,7 +295,7 @@ func (h *WSHandler) generateResultsHTML(room *game.Room, myPlayerID string) stri
     return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML">%s</div>`, out.String())
 }
 
-func (h *WSHandler) generateLobbyHTML(room *game.Room) string {
+func (h *WSHandler) generateLobbyHTML(room *game.Room, playerID string) string {
 	// Reutilizamos el archivo lobby.html que ya creamos
 	files := []string{"ui/html/pages/lobby.html"}
 	
@@ -306,8 +304,15 @@ func (h *WSHandler) generateLobbyHTML(room *game.Room) string {
 		return fmt.Sprintf("Error template lobby: %v", err)
 	}
 
+	isHost := false
+	if p, ok := room.Players[playerID]; ok {
+		isHost = p.IsHost
+	}
+
 	data := map[string]interface{}{
 		"RoomID": room.ID,
+		"Config": room.Config,
+		"IsHost": isHost,
 	}
 
 	var out strings.Builder

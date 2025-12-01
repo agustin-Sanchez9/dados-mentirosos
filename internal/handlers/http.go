@@ -95,20 +95,34 @@ func (h *GameHandler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/room/"+roomID, http.StatusSeeOther)
 }
 
-// Room sirve la pantalla de espera (Lobby)
+// Room sirve la pantalla de espera
 func (h *GameHandler) Room(w http.ResponseWriter, r *http.Request) {
 	roomID := chi.URLParam(r, "roomID")
 
-	// Se verifica si la sala existe
 	room, err := h.Manager.GetRoom(roomID)
 	if err != nil {
-		http.Error(w, "Sala no encontrada", http.StatusNotFound)
+		http.Redirect(w, r, "/?error=notfound", http.StatusSeeOther)
 		return
 	}
 
-	// Se renderiza la vista de juego/lobby, se pasa el RoomID para que el HTML sepa a que websocket conectarse
+	// Detectar host leyendo la cookie
+	isHost := false
+	cookie, err := r.Cookie("player_id")
+	if err == nil {
+		parts := strings.Split(cookie.Value, ":")
+		playerID := parts[0]
+
+		if p, ok := room.Players[playerID]; ok && p.IsHost {
+			isHost = true
+		} else if len(room.Players) == 0 {
+			// Caso especial: Si la sala esta vacia, el primero que entra sera el host
+			isHost = true
+		}
+	}
 	data := map[string]interface{}{
 		"RoomID": room.ID,
+		"Config": room.Config,
+		"IsHost": isHost,
 	}
 	h.render(w, "lobby.html", data)
 }
