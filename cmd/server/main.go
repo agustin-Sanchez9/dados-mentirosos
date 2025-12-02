@@ -36,6 +36,7 @@ func main() {
 	r.Post("/game/bet", wsHandler.HandleBet)
 	r.Post("/game/liar", wsHandler.HandleLiar)
 	r.Post("/game/restart", wsHandler.HandleRestart)
+	r.Post("/game/config", wsHandler.HandleUpdateConfig)
 
 	// Rutas WS
 	r.Get("/ws/{roomID}", wsHandler.HandleRequest)
