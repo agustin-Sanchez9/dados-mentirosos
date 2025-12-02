@@ -21,7 +21,7 @@
         <div class="flex flex-col gap-1">
             <label class="text-xs text-slate-400 font-bold ml-1">Dados por Jugador</label>
             <div class="relative">
-                <select name="initial_dice_count" class="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer hover:bg-slate-800 transition-colors">
+                <select name="dices_amount" class="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer hover:bg-slate-800 transition-colors">
                     <option value="3" {{if eq .Config.DicesAmount 3}}selected{{end}}>3 Dados</option>
                     <option value="4" {{if eq .Config.DicesAmount 4}}selected{{end}}>4 Dados</option>
                     <option value="5" {{if eq .Config.DicesAmount 5}}selected{{end}}>5 Dados</option>
@@ -82,7 +82,7 @@
             <div class="bg-slate-800 p-2 rounded text-xl">🎲</div>
             <div>
                 <p class="text-[10px] text-slate-500 uppercase font-bold">Dados Iniciales</p>
-                <p class="text-sm font-bold text-white">{{.Config.InitialDiceCount}}</p>
+                <p class="text-sm font-bold text-white">{{.Config.DicesAmount}}</p>
             </div>
         </div>
         
@@ -91,7 +91,7 @@
             <div>
                 <p class="text-[10px] text-slate-500 uppercase font-bold">Tiempo Turno</p>
                 <p class="text-sm font-bold text-white">
-                    {{if eq .Config.TurnDurationSeconds 0}}Sin Límite{{else}}{{.Config.TurnDurationSeconds}}s{{end}}
+                    {{if eq .Config.TurnDuration 0}}Sin Límite{{else}}{{.Config.TurnDuration}}s{{end}}
                 </p>
             </div>
         </div>

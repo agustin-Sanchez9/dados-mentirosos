@@ -231,7 +231,7 @@ func (h *WSHandler) generateGameScreenHTML(room *game.Room, myPlayerID string) s
 		return `<div class="text-red-500">Error interno cargando el juego</div>`
 	}
 
-	// 3. Renderizar a String
+	// Renderizar a String
 	var out strings.Builder
 	err = tmpl.ExecuteTemplate(&out, "game_screen", data)
 	if err != nil {
@@ -239,7 +239,6 @@ func (h *WSHandler) generateGameScreenHTML(room *game.Room, myPlayerID string) s
 		return `<div class="text-red-500">Error renderizando el juego</div>`
 	}
 
-	// 4. Envolver en OOB swap
 	return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML">%s</div>`, out.String())
 }
 
