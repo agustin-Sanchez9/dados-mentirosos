@@ -477,8 +477,9 @@ func (h *WSHandler) HandleUpdateConfig(w http.ResponseWriter, r *http.Request) {
 
 	// Actualizar Configuración (Protegido por Mutex)
 	room.Mutex.Lock()
-	room.Config.DicesAmount = atoi(r.FormValue("initial_dice_count"))
+	room.Config.DicesAmount = atoi(r.FormValue("dices_amount"))
 	room.Config.TurnDuration = atoi(r.FormValue("turn_duration"))
+	room.Config.MaxPlayers = atoi(r.FormValue("max_players"))
 	room.Config.MinBetIncrement = atoi(r.FormValue("min_bet_increment"))
 	room.Config.WildAces = (r.FormValue("wild_aces") == "on")
 	
@@ -488,6 +489,9 @@ func (h *WSHandler) HandleUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	if room.Config.MinBetIncrement < 1 { room.Config.MinBetIncrement = 1 }
 	
 	room.Mutex.Unlock()
+
+	fmt.Printf("✅ SALA ACTUALIZADA: Dados=%d, Tiempo=%d\n", room.Config.DicesAmount, room.Config.TurnDuration)
+
 	h.broadcastGameState(roomID)
 	w.WriteHeader(http.StatusOK)
 }
