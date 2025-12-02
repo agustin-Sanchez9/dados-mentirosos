@@ -22,10 +22,10 @@
             <label class="text-xs text-slate-400 font-bold ml-1">Dados por Jugador</label>
             <div class="relative">
                 <select name="initial_dice_count" class="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer hover:bg-slate-800 transition-colors">
-                    <option value="3" {{if eq .Config.InitialDiceCount 3}}selected{{end}}>3 Dados</option>
-                    <option value="4" {{if eq .Config.InitialDiceCount 4}}selected{{end}}>4 Dados</option>
-                    <option value="5" {{if eq .Config.InitialDiceCount 5}}selected{{end}}>5 Dados</option>
-                    <option value="6" {{if eq .Config.InitialDiceCount 6}}selected{{end}}>6 Dados</option>
+                    <option value="3" {{if eq .Config.DicesAmount 3}}selected{{end}}>3 Dados</option>
+                    <option value="4" {{if eq .Config.DicesAmount 4}}selected{{end}}>4 Dados</option>
+                    <option value="5" {{if eq .Config.DicesAmount 5}}selected{{end}}>5 Dados</option>
+                    <option value="6" {{if eq .Config.DicesAmount 6}}selected{{end}}>6 Dados</option>
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -37,10 +37,10 @@
             <label class="text-xs text-slate-400 font-bold ml-1">Tiempo de Turno</label>
             <div class="relative">
                 <select name="turn_duration" class="w-full bg-slate-900 text-white border border-slate-600 rounded-lg p-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none cursor-pointer hover:bg-slate-800 transition-colors">
-                    <option value="30" {{if eq .Config.TurnDurationSeconds 30}}selected{{end}}>⏱️ 30 Segundos (Blitz)</option>
-                    <option value="60" {{if eq .Config.TurnDurationSeconds 60}}selected{{end}}>⏱️ 60 Segundos (Normal)</option>
-                    <option value="90" {{if eq .Config.TurnDurationSeconds 90}}selected{{end}}>⏱️ 90 Segundos (Relax)</option>
-                    <option value="0"  {{if eq .Config.TurnDurationSeconds 0}}selected{{end}}>♾️ Sin Límite</option>
+                    <option value="30" {{if eq .Config.TurnDuration 30}}selected{{end}}>⏱️ 30 Segundos (Blitz)</option>
+                    <option value="60" {{if eq .Config.TurnDuration 60}}selected{{end}}>⏱️ 60 Segundos (Normal)</option>
+                    <option value="90" {{if eq .Config.TurnDuration 90}}selected{{end}}>⏱️ 90 Segundos (Relax)</option>
+                    <option value="0"  {{if eq .Config.TurnDuration 0}}selected{{end}}>♾️ Sin Límite</option>
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
                     <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
