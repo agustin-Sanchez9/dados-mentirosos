@@ -1,36 +1,101 @@
 {{define "controls"}}
 <form hx-post="/game/bet?roomID={{.RoomID}}" 
       hx-swap="none" 
-      class="flex flex-col gap-3">
-    
-    <div id="bet-error" class="text-red-500 text-xs text-center font-bold"></div>
+      class="flex flex-col gap-4 w-full">
+
+    <div id="bet-error" class="text-red-500 text-xs text-center font-bold min-h-[1.25rem]"></div>
 
     {{if gt .CurrentBetQty 0}}
         <button hx-post="/game/liar?roomID={{.RoomID}}" 
                 hx-swap="none"
-                class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 rounded uppercase tracking-wider shadow-lg transition transform active:scale-95">
-            ¡MENTIROSO!
+                class="w-full bg-red-600/90 hover:bg-red-500 text-white font-black py-4 rounded-xl uppercase tracking-widest shadow-[0_4px_0_rgb(153,27,27)] active:shadow-none active:translate-y-[4px] transition-all flex items-center justify-center gap-2">
+            <span>🤥 ¡MENTIROSO!</span>
         </button>
-        <div class="text-center text-slate-500 text-xs">- O -</div>
+        
+        <div class="flex items-center gap-4">
+            <div class="h-[1px] bg-slate-700 flex-1"></div>
+            <span class="text-xs text-slate-500 font-bold">O SUBIR APUESTA</span>
+            <div class="h-[1px] bg-slate-700 flex-1"></div>
+        </div>
     {{end}}
 
-    <div class="flex gap-2">
-        <div class="flex-1">
-            <label class="text-xs text-slate-400">Cantidad</label>
-            <input type="number" name="quantity" min="1" required
+    <div class="bg-slate-900 p-1 rounded-xl border border-slate-700 flex items-center">
+        <button type="button" 
+                onclick="adjustValue('quantity', -1)"
+                class="w-12 h-12 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center active:bg-slate-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+        </button>
+
+        <div class="flex-1 text-center">
+            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">CANTIDAD</p>
+            <input type="number" id="quantity" name="quantity" readonly
+                   min="1"
                    value="{{if .CurrentBetQty}}{{.CurrentBetQty}}{{else}}1{{end}}" 
-                   class="w-full bg-slate-700 text-white p-2 rounded text-center font-bold text-xl border border-slate-600 focus:border-yellow-500 outline-none">
+                   class="bg-transparent text-white text-3xl font-black text-center w-full outline-none border-none p-0 cursor-default select-none">
         </div>
-        <div class="flex-1">
-            <label class="text-xs text-slate-400">Cara (1-6)</label>
-            <input type="number" name="face" min="1" max="6" required
-                   value="{{if .CurrentBetFace}}{{.CurrentBetFace}}{{else}}2{{end}}" 
-                   class="w-full bg-slate-700 text-white p-2 rounded text-center font-bold text-xl border border-slate-600 focus:border-yellow-500 outline-none">
+
+        <button type="button" 
+                onclick="adjustValue('quantity', 1)"
+                class="w-12 h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+    </div>
+
+    <div class="bg-slate-900 p-1 rounded-xl border border-slate-700 flex items-center">
+        <button type="button" 
+                onclick="adjustFace(-1)"
+                class="w-12 h-12 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg flex items-center justify-center active:bg-slate-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+
+        <div class="flex-1 text-center">
+            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">VALOR DEL DADO</p>
+            <input type="number" id="face" name="face" readonly hidden
+                   value="{{if .CurrentBetFace}}{{.CurrentBetFace}}{{else}}2{{end}}">
+            
+            <div id="face-display" class="text-3xl font-black text-yellow-400">
+                🎲 {{if .CurrentBetFace}}{{.CurrentBetFace}}{{else}}2{{end}}
+            </div>
         </div>
+
+        <button type="button" 
+                onclick="adjustFace(1)"
+                class="w-12 h-12 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
     </div>
     
-    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded shadow-lg transition transform active:scale-95">
-        SUBIR APUESTA
+    <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-[0_4px_0_rgb(21,128,61)] active:shadow-none active:translate-y-[4px] transition-all mt-2 text-lg">
+        APOSTAR
     </button>
 </form>
+
+<script>
+    // Lógica simple para controlar los botones sin abrir teclado
+    function adjustValue(id, delta) {
+        const input = document.getElementById(id);
+        let val = parseInt(input.value) || 0;
+        val += delta;
+        if (val < 1) val = 1; // Mínimo 1
+        input.value = val;
+    }
+
+    function adjustFace(delta) {
+        const input = document.getElementById('face');
+        const display = document.getElementById('face-display');
+        let val = parseInt(input.value) || 1;
+        
+        val += delta;
+        
+        // Rotación circular: Si pasa de 6 vuelve a 1, si baja de 1 va a 6
+        if (val > 6) val = 1;
+        if (val < 1) val = 6;
+        
+        input.value = val;
+        
+        // Actualizar icono visual
+        // Podrías poner caracteres unicode de dados si quisieras: ⚀ ⚁ ⚂ ⚃ ⚄ ⚅
+        display.innerText = "🎲 " + val; 
+    }
+</script>
 {{end}}
