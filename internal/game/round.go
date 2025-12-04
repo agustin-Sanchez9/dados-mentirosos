@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"time"
 )
 
 var (
@@ -21,8 +22,7 @@ func (r *Room) rollDice(p *Player) {
 	}
 }
 
-// ---Logica de Apuestas---
-
+// PlaceBet maneja la logica de realizar apuestas
 func (r *Room) PlaceBet(playerID string, quantity int, face int) error {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock()
@@ -45,10 +45,12 @@ func (r *Room) PlaceBet(playerID string, quantity int, face int) error {
 	r.State.LastBetPlayerID = playerID
 	
 	r.nextTurn()
+	r.resetTurnTimer()
 	
 	return nil
 }
 
+// isValidBet realiza el chequeo de si la apuesta es valida
 func (r *Room) isValidBet(qty int, face int) bool {
 	if r.State.CurrentBetQuantity == 0 {
 		return qty > 0 && face >= 1 && face <= 6
@@ -69,6 +71,8 @@ func (r *Room) CallLiar(accuserPlayerID string) (*GameResult, error) {
 	if r.State.CurrentBetQuantity == 0 {
 		return nil, ErrNoBetMade
 	}
+
+	r.stopTurnTimer() // el jeugo termina asi que paramos el timer
 
 	// Calcular la realidad
 	targetFace := r.State.CurrentBetFace
@@ -142,4 +146,60 @@ func (r *Room) nextTurn() {
 
 	nextIdx := (currentIdx + 1) % len(r.PlayerOrder)
 	r.State.CurrentPlayerID = r.PlayerOrder[nextIdx]
+}
+
+// resetTurnTimer inicia el timer para el jugador actual
+func (r *Room) resetTurnTimer() {
+	r.stopTurnTimer() // detener el timer si existe
+
+	if r.Config.TurnDuration <= 0 { // duracion 0 representa infinito
+		return
+	}
+
+	duration := time.Duration(r.Config.TurnDuration) * time.Second
+	r.TurnDeadline = time.Now().Add(duration)
+
+	r.TurnTimer = time.AfterFunc(duration, func() {
+		r.handleTimeout()
+	})
+}
+
+// stopTurnTimer detiene el reloj
+func (r *Room) stopTurnTimer() {
+	if r.TurnTimer != nil {
+		r.TurnTimer.Stop()
+		r.TurnTimer = nil
+	}
+	r.TurnDeadline = time.Time{} // resetear fecha
+}
+
+// handleTimeout se ejecuta cuando se termina el tiempo
+func (r *Room) handleTimeout() {
+	r.Mutex.Lock()
+	defer r.Mutex.Unlock()
+
+	if r.Status != "PLAYING" {
+		return
+	}
+
+	currentPlayer := r.State.CurrentPlayerID
+
+	quantity := r.State.CurrentBetQuantity + r.Config.MinBetIncrement
+	face := r.State.CurrentBetFace
+
+	if r.State.CurrentBetQuantity == 0 {
+		quantity = r.Config.MinBetIncrement
+		face = 2
+	}
+
+	r.State.CurrentBetFace = face
+	r.State.CurrentBetQuantity = quantity
+	r.State.LastBetPlayerID = currentPlayer
+
+	r.nextTurn()
+	r.resetTurnTimer()
+
+	if r.OnUpdate != nil {
+		go r.OnUpdate(r.ID) // goroutine aparte para no bloquear el mutex
+	}
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/olahol/melody"
@@ -35,6 +36,9 @@ func NewWSHandler(m *melody.Melody, gm *game.GameManager, gh *GameHandler) *WSHa
 
 		room, err := handler.Manager.GetRoom(roomID)
 		if err == nil {
+			if room.OnUpdate == nil {
+				room.OnUpdate = handler.broadcastGameState
+			}
 			newPlayer := &game.Player{
 				ID:   playerID,
 				Name: playerName,
@@ -207,6 +211,14 @@ func (h *WSHandler) generateGameScreenHTML(room *game.Room, myPlayerID string) s
 		lastBetPlayerName = p.Name
 	}
 
+	secondsLeft := 0
+		if !room.TurnDeadline.IsZero() {
+    	remaining := time.Until(room.TurnDeadline)
+    	if remaining > 0 {
+        	secondsLeft = int(remaining.Seconds())
+    	}
+	}
+
 	data := map[string]interface{}{
 		"RoomID":            room.ID,
 		"IsMyTurn":          (room.State.CurrentPlayerID == myPlayerID),
@@ -216,6 +228,7 @@ func (h *WSHandler) generateGameScreenHTML(room *game.Room, myPlayerID string) s
 		"LastBetPlayer":     lastBetPlayerName,
 		"MyDice":            me.Dice,
 		"Opponents":         opponents,
+		"SecondsLeft":       secondsLeft,
 	}
 
 	// Cargar los templates necesarios aquí mismo

@@ -3,6 +3,7 @@ package game
 import (
 	"math/rand"
 	"sync"
+	"time"
 )
 
 // Representara un dado (1-6)
@@ -33,6 +34,8 @@ type RoundState struct {
 	CurrentBetFace int // cada de la apuesta
 }
 
+type UpdateCallback func(roomID string)
+
 // Sala completa
 type Room struct {
 	ID string
@@ -44,6 +47,9 @@ type Room struct {
 	Status string // "WAITING", "PLAYING", "FINISHED"
 	rng *rand.Rand
 	LastResult *GameResult
+	TurnTimer *time.Timer // reloj interno
+	TurnDeadline time.Time // hora exacta
+	OnUpdate UpdateCallback // funcion para actualizar pantallas
 }
 
 // GameResult contiene los datos finales para mostrar en la pantalla de resultados

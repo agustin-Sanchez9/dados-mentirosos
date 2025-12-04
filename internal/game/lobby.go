@@ -108,6 +108,9 @@ func (r *Room) StartGame(playerID string) error {
 		CurrentPlayerID: playerID, // por ahora el primero sera el host
 	}
 	r.rollAllDice()
+
+	r.resetTurnTimer()
+
 	return nil
 }
 
@@ -131,4 +134,6 @@ func (r *Room) Reset() {
 	
 	// Limpiamos el orden (se calcula al iniciar de nuevo)
 	r.PlayerOrder = nil
+
+	r.stopTurnTimer() // que no quede el timer corriendo
 }
