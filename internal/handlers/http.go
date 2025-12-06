@@ -74,7 +74,7 @@ func (h *GameHandler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 		MaxPlayers: 7,
 		DicesAmount: 5,
 		MinBetIncrement: 1,
-		WildAces: true,
+		WildAces: false,
 	}
 
 	// Se genera ID unico para la sala (o usar uno corto de 4 letras)
