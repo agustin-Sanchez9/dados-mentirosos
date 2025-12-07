@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"math/rand"
 	"dados-mentirosos/internal/game"
 	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -24,6 +26,19 @@ func NewGameHandler(manager *game.GameManager) *GameHandler {
 // Home sirve la pantalla principal
 func (h *GameHandler) Home(w http.ResponseWriter, r *http.Request) {
 	h.render(w, "home.html", nil)
+}
+
+// generateRoomCode para crear un codigo alfanumerico de n caracteres
+func generateRoomCode(length int) string {
+	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seed.Intn(len(charset))]
+	}
+	return string(b)
 }
 
 
@@ -77,8 +92,8 @@ func (h *GameHandler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 		WildAces: false,
 	}
 
-	// Se genera ID unico para la sala (o usar uno corto de 4 letras)
-	roomID := strings.Split(uuid.New().String(), "-")[0] // Solo la primera parte para que sea corto
+	// Se genera ID unico para la sala de 5 caracteres
+	roomID := generateRoomCode(5)
 
 	// Se crea la sala en memoria
 	h.Manager.CreateRoom(roomID, config)
