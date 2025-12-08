@@ -36,11 +36,11 @@ type RoundState struct {
 
 type UpdateCallback func(roomID string)
 
-// Sala completa
+// estructura de la sala
 type Room struct {
 	ID string
 	Mutex sync.RWMutex
-	Players map[string]*Player
+	Players map[string]*Player // lista de jugadores
 	PlayerOrder []string // lista para saber el orden de la mesa
 	Config GameConfig
 	State RoundState

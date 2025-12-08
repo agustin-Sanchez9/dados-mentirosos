@@ -325,6 +325,7 @@ func (h *WSHandler) generateLobbyHTML(room *game.Room, playerID string) string {
 		"RoomID": room.ID,
 		"Config": room.Config,
 		"IsHost": isHost,
+		"Players": room.Players,
 	}
 
 	var out strings.Builder

@@ -27,7 +27,7 @@ func NewRoom(id string, config GameConfig) *Room {
 	}
 }
 
-// AddPlayer maneja el aniadir un jugador a una sala
+// AddPlayer maneja que un jugador se una a la sala
 func (r *Room) AddPlayer(p *Player) error {
 	r.Mutex.Lock()
 	defer r.Mutex.Unlock() // se ejecuta al salir de la funcion

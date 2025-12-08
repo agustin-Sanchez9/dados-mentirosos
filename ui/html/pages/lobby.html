@@ -29,9 +29,20 @@
         </h2>
         
         <ul id="players-list" class="space-y-2 min-h-[100px]">
-            <li class="text-slate-500 italic text-sm flex items-center gap-2">
-                <span class="animate-spin">⌛</span> Conectando...
-            </li>
+            {{if .Players}}
+                {{range .Players}}
+                <li class="bg-slate-700 p-2 rounded flex justify-between items-center animate-fade-in">
+                    <span class="font-bold text-slate-200">{{.Name}}</span>
+                    {{if .IsHost}}
+                        <span class="text-xs bg-yellow-500 text-black px-1.5 rounded font-bold">HOST</span>
+                    {{end}}
+                </li>
+                {{end}}
+            {{else}}
+                <li class="text-slate-500 italic text-sm flex items-center gap-2">
+                    <span class="animate-spin">⌛</span> Esperando jugadores...
+                </li>
+            {{end}}
         </ul>
     </div>
 
