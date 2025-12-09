@@ -17,56 +17,49 @@
 
     <div class="grid grid-cols-2 gap-3">
         
-        <div class="bg-slate-900 p-1 rounded-xl border border-slate-700 flex items-center justify-between h-14 relative">
-            
-            <p class="absolute -top-2 left-1/2 -translate-x-1/2 bg-slate-800 px-1 text-[8px] text-slate-400 uppercase font-bold rounded border border-slate-700">CANTIDAD</p>
-
+        <div class="bg-slate-900 p-1 rounded-xl border border-slate-700 flex items-center justify-between h-14">
             <button type="button" onclick="adjustValue('quantity', -1)"
-                    class="w-10 h-full bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 active:bg-slate-600 flex items-center justify-center border-r border-slate-800">
+                    class="w-12 h-full bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 active:bg-slate-600 flex items-center justify-center border-r border-slate-800 transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
             </button>
 
             <input type="number" id="quantity" name="quantity" readonly min="1"
                    value="{{if .CurrentBetQty}}{{.CurrentBetQty}}{{else}}1{{end}}" 
-                   class="bg-transparent text-white text-3xl font-black text-center w-full outline-none border-none p-0 cursor-default h-full pb-1">
+                   class="bg-transparent text-white text-4xl font-black text-center w-full outline-none border-none p-0 cursor-default h-full pb-1">
 
             <button type="button" onclick="adjustValue('quantity', 1)"
-                    class="w-10 h-full bg-blue-600 text-white rounded-lg hover:bg-blue-500 active:bg-blue-700 flex items-center justify-center shadow-md">
+                    class="w-12 h-full bg-blue-600 text-white rounded-lg hover:bg-blue-500 active:bg-blue-700 flex items-center justify-center shadow-md transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
             </button>
         </div>
 
-        <div class="bg-slate-900 p-1 rounded-xl border border-slate-700 flex items-center justify-between h-14 relative">
-            
-            <p class="absolute -top-2 left-1/2 -translate-x-1/2 bg-slate-800 px-1 text-[8px] text-slate-400 uppercase font-bold rounded border border-slate-700">VALOR</p>
-
+        <div class="bg-slate-900 p-1 rounded-xl border border-slate-700 flex items-center justify-between h-14">
             <button type="button" onclick="adjustFace(-1)"
-                    class="w-10 h-full bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 active:bg-slate-600 flex items-center justify-center border-r border-slate-800">
+                    class="w-12 h-full bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 active:bg-slate-600 flex items-center justify-center border-r border-slate-800 transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
 
             <div class="text-center w-full h-full flex items-center justify-center pb-1">
                 <input type="number" id="face" name="face" readonly hidden
                        value="{{if .CurrentBetFace}}{{.CurrentBetFace}}{{else}}2{{end}}">
-                <div id="face-display" class="text-3xl font-black text-yellow-400 leading-none">
+                <div id="face-display" class="text-4xl font-black text-yellow-400 leading-none">
                     🎲 {{if .CurrentBetFace}}{{.CurrentBetFace}}{{else}}2{{end}}
                 </div>
             </div>
 
             <button type="button" onclick="adjustFace(1)"
-                    class="w-10 h-full bg-yellow-600 text-white rounded-lg hover:bg-yellow-500 active:bg-yellow-700 flex items-center justify-center shadow-md">
+                    class="w-12 h-full bg-yellow-600 text-white rounded-lg hover:bg-yellow-500 active:bg-yellow-700 flex items-center justify-center shadow-md transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
             </button>
         </div>
     </div>
     
     <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-black py-4 rounded-xl shadow-[0_4px_0_rgb(21,128,61)] active:shadow-none active:translate-y-[4px] transition-all text-sm uppercase tracking-widest mt-1">
-        CONFIRMAR APUESTA
+        CONFIRMAR
     </button>
 </form>
 
 <script>
-    // (Mismo JS que antes)
     function adjustValue(id, delta) {
         const input = document.getElementById(id);
         let val = parseInt(input.value) || 0;

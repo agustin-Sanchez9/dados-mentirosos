@@ -19,12 +19,16 @@
     <div class="flex-1 min-h-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800 to-slate-900 p-2 flex flex-col items-center relative">
         
         <div class="w-full flex justify-center py-2 shrink-0 z-10">
-             <div class="flex flex-wrap justify-center gap-1.5">
+             <div class="flex flex-wrap justify-center gap-2">
                  {{range .Opponents}}
-                    <div class="bg-slate-800/80 border border-slate-600 p-1 rounded flex flex-col items-center w-12 shadow-sm {{if .IsTurn}}ring-1 ring-yellow-400 bg-slate-700{{end}}">
-                        <div class="text-base leading-none mb-0.5">👤</div>
-                        <div class="text-[7px] text-slate-300 truncate w-full text-center">{{.Name}}</div>
-                        <div class="text-[7px] font-bold text-slate-400">{{.DiceCount}}🎲</div>
+                    <div class="bg-slate-800/80 border border-slate-600 p-1.5 rounded-lg flex flex-col items-center w-20 shadow-md transition-transform {{if .IsTurn}}ring-2 ring-yellow-400 bg-slate-700 scale-105{{end}}">
+                        <div class="text-3xl leading-none mb-1">👤</div>
+                        
+                        <div class="text-[10px] font-bold text-slate-300 truncate w-full text-center">{{.Name}}</div>
+                        
+                        <div class="mt-1 text-[10px] font-bold bg-slate-900 text-slate-400 px-2 rounded-full border border-slate-700">
+                            {{.DiceCount}} 🎲
+                        </div>
                     </div>
                  {{end}}
              </div>
@@ -34,7 +38,7 @@
             {{if eq .CurrentBetQty 0}}
                 <div class="text-slate-600 border border-dashed border-slate-700/50 rounded-xl p-4 text-center w-48">
                     <p class="text-3xl opacity-30 mb-1">🎲</p>
-                    <p class="text-xs opacity-50">Mesa vacía</p>
+                    <p class="text-xs opacity-50">Esperando...</p>
                 </div>
             {{else}}
                 <div class="bg-slate-800/90 backdrop-blur px-6 py-4 rounded-2xl border border-yellow-500/30 shadow-[0_0_25px_rgba(234,179,8,0.15)] flex flex-col items-center animate-[pulse_3s_infinite]">

@@ -152,7 +152,7 @@ func (h *GameHandler) JoinRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	playerName := r.FormValue("player_name")
-	roomID := r.FormValue("room_id")
+	roomID := strings.ToLower(strings.TrimSpace(r.FormValue("room_id")))
 
 	// Validar que la sala exista Y que se pueda entrar
 	room, err := h.Manager.GetRoom(roomID)
