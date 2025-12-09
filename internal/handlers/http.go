@@ -30,7 +30,7 @@ func (h *GameHandler) Home(w http.ResponseWriter, r *http.Request) {
 
 // generateRoomCode para crear un codigo alfanumerico de n caracteres
 func generateRoomCode(length int) string {
-	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 
 	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
 
