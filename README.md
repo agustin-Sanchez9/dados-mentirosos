@@ -16,36 +16,29 @@ dados-mentirosos/
 │   └── server/
 │       └── main.go           # Arranca HTTP y Websockets
 ├── internal/
-│   ├── game/                 # TU LÓGICA DE NEGOCIO
+│   ├── game/                 
 │   │   ├── lobby.go          # Crear sala, unir jugador, guardar configs.
+|   |   ├── manager.go        # Gestiona las salas activas del servidor.
 │   │   ├── round.go          # Lógica de apuestas, turnos, mentirosos.
 │   │   └── types.go          # Structs (Room, Player, Config).
 │   └── handlers/             # MANEJADORES DE RUTAS
 │       ├── http.go           # GET /, POST /create, POST /enter
 │       └── ws.go             # Websockets del juego.
-├── ui/
-│   ├── static/
-│   │   ├── css/              # Tailwind output
-│   │   └── js/               # htmx.js, ws.js (pequeño script para reconectar)
-│   └── html/
-│       ├── base.html         # <html>, <head>, <body> container principal
-│       ├── pages/            # PANTALLAS COMPLETAS (Los contenedores)
-│       │   ├── home.html     # Pantalla 1: Título y Forms
-│       │   ├── lobby.html    # Pantalla 2: Contenedor del Lobby
-│       │   ├── game.html     # Pantalla 3: Contenedor del Juego
-│       │   └── results.html  # Pantalla 4: Contenedor de Resultados
-│       └── partials/         # COMPONENTES REUTILIZABLES (Lo que HTMX actualiza)
-│           ├── lobby/
-│           │   ├── player_list.html   # Lista de jugadores (se actualiza sola)
-│           │   ├── config_host.html   # Inputs activados (Solo para el Creador)
-│           │   └── config_guest.html  # Solo texto/iconos (Para los demás)
-│           ├── game/
-│           │   ├── board_info.html    # "Turno de X", "Apuesta actual"
-│           │   ├── my_hand.html       # Mis dados (Botones 1-6 o imágenes)
-│           │   └── controls.html      # Formulario de apuesta o botón "Mentiroso"
-│           └── results/
-│               └── scoreboard.html    # La tabla de quien tenía qué
-└── go.mod
+└── ui/
+   └── html/
+       ├── base.html         # <html>, <head>, <body> container principal
+       ├── pages/            
+       │   ├── home.html     # Pantalla inicial con el formulario para unirse o crear sala.
+       │   ├── lobby.html    # Pantalla de la sala, con lista de jugadores y configuraciones.
+       │   └── game.html     # Pantalla de juego.
+       └── partials/         # COMPONENTES REUTILIZABLES (Lo que HTMX actualiza)
+           ├── game/
+           │   ├── screen.html    # Pantalla base del juego que muestra los jugadores y la apuesta actual
+           │   ├── results.html   # Pantalla que muestra los resultados
+           │   └── controls.html  # ui de controles para apuestas y para llamar mentiroso
+           └── lobby/
+               └── settings.html  # ui de configuraciones para el usuario
+
 ```
 
 ## Cuestiones basicas
@@ -58,3 +51,4 @@ dados-mentirosos/
     - Minimo de incremento de apuesta por ronda (1, 2, o 3).
     - Los 1 son comodines, es decir cuentan para la suma de todos los dados.
 - Una vez finalizada la partida los jugadores podran empezar una nueva o volver al menu de inicio.
+
