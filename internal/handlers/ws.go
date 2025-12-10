@@ -257,7 +257,7 @@ func (h *WSHandler) generateGameScreenHTML(room *game.Room, myPlayerID string) s
 
 func (h *WSHandler) generateResultsHTML(room *game.Room, myPlayerID string) string {
     // Debug: Avisar que intentamos generar resultados
-    fmt.Printf("🎨 Generando pantalla de resultados para %s...\n", myPlayerID)
+    fmt.Printf("Generando pantalla de resultados para %s...\n", myPlayerID)
 
     playersList := make([]*game.Player, 0)
     for _, p := range room.Players {
@@ -282,6 +282,7 @@ func (h *WSHandler) generateResultsHTML(room *game.Room, myPlayerID string) stri
         "Result":  room.LastResult,
         "Players": playersList,
         "IsHost":  room.Players[myPlayerID].IsHost,
+		"Config":  room.Config,
     }
 
     // Asegurarse de que la ruta es correcta
@@ -291,7 +292,7 @@ func (h *WSHandler) generateResultsHTML(room *game.Room, myPlayerID string) stri
     tmpl, err := template.New("results_screen").Funcs(funcMap).ParseFiles(files...)
     if err != nil {
         // ERROR CRÍTICO 1: No se encontró el archivo o falló el parseo
-        fmt.Printf("❌ ERROR ParseFiles Results: %v\n", err)
+        fmt.Printf("ERROR ParseFiles Results: %v\n", err)
         return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML" class="bg-red-900 p-4 text-white">ERROR TEMPLATE: %v</div>`, err)
     }
 
@@ -299,11 +300,11 @@ func (h *WSHandler) generateResultsHTML(room *game.Room, myPlayerID string) stri
     err = tmpl.ExecuteTemplate(&out, "results_screen", data)
     if err != nil {
         // ERROR CRÍTICO 2: Falló al ejecutar (variable faltante, función mal llamada)
-        fmt.Printf("❌ ERROR ExecuteTemplate Results: %v\n", err)
+        fmt.Printf("ERROR ExecuteTemplate Results: %v\n", err)
         return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML" class="bg-red-900 p-4 text-white">ERROR EXEC: %v</div>`, err)
     }
 
-    fmt.Println("✅ HTML Resultados generado correctamente")
+    fmt.Println("HTML Resultados generado correctamente")
     return fmt.Sprintf(`<div id="content" hx-swap-oob="innerHTML">%s</div>`, out.String())
 }
 

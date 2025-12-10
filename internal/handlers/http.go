@@ -41,7 +41,6 @@ func generateRoomCode(length int) string {
 	return string(b)
 }
 
-
 // render carga el layout, la pagina solicitada Y los partials necesarios explicitamente
 func (h *GameHandler) render(w http.ResponseWriter, page string, data any) {
 	files := []string{

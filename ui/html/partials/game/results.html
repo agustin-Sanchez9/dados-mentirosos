@@ -41,7 +41,7 @@
                 </div>
                 <div class="flex flex-wrap gap-1 justify-center">
                     {{range .Dice}}
-                        <div class="w-8 h-8 flex items-center justify-center rounded bg-slate-200 text-slate-900 font-bold text-sm {{if or (eq (toInt .) $.Result.BetFace) (eq (toInt .) 1)}}ring-2 ring-yellow-400 bg-white{{else}}opacity-50{{end}}">
+                        <div class="w-8 h-8 flex items-center justify-center rounded bg-slate-200 text-slate-900 font-bold text-sm {{if or (eq (toInt .) $.Result.BetFace) (and $.Config.WildAces (eq (toInt .) 1))}}ring-2 ring-yellow-400 bg-white{{else}}opacity-50{{end}}">
                             {{.}}
                         </div>
                     {{end}}
