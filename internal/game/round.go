@@ -203,3 +203,30 @@ func (r *Room) handleTimeout() {
 		go r.OnUpdate(r.ID) // goroutine aparte para no bloquear el mutex
 	}
 }
+
+// NextRound inicia una nueva ronda donde el perdedor anterior es quien inicia
+func (r *Room) NextRound() {
+	r.Mutex.Lock()
+	defer r.Mutex.Unlock()
+
+	startPlayerID := ""
+	if r.LastResult != nil {
+		startPlayerID = r.LastResult.LoserID
+	}
+
+	if startPlayerID == "" && len(r.PlayerOrder) > 0 {
+		startPlayerID = r.PlayerOrder[0]
+	}
+
+	r.LastResult = nil // limpiamos estado de la ronda
+	r.Status = "PLAYING" // asegurar que no se pierda el estado jugando
+
+	r.State = RoundState{
+		CurrentBetQuantity: 0,
+		CurrentBetFace: 0,
+		CurrentPlayerID: startPlayerID, // asignamos al perdedor como quien arranca
+	}
+
+	r.rollAllDice() // volver a tirar los dados
+	r.resetTurnTimer() // resetear reloj
+}

@@ -52,15 +52,27 @@
     </div>
 
     {{if .IsHost}}
-    <div class="p-4 bg-slate-800 border-t border-slate-700">
-        <button hx-post="/game/restart?roomID={{.RoomID}}" 
-                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all">
-            JUGAR OTRA VEZ
+    <div class="p-4 bg-slate-800 border-t border-slate-700 flex flex-col gap-3">
+        
+        <button hx-post="/game/next-round?roomID={{.RoomID}}" 
+                class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg shadow-[0_4px_0_rgb(21,128,61)] active:shadow-none active:translate-y-[4px] transition-all flex items-center justify-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+            JUGAR SIGUIENTE RONDA
         </button>
+
+        <button hx-post="/game/restart?roomID={{.RoomID}}" 
+                class="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold py-3 rounded-lg border border-slate-600 flex items-center justify-center gap-2 text-sm">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Volver al Lobby (Configurar)
+        </button>
+        
+        <p class="text-center text-[10px] text-slate-500 mt-1">
+            "Siguiente Ronda" mantiene la configuración actual y empieza el perdedor.
+        </p>
     </div>
     {{else}}
-    <div class="p-4 text-center text-slate-500 text-sm italic">
-        Esperando que el anfitrión reinicie...
+    <div class="p-4 text-center text-slate-500 text-sm italic animate-pulse">
+        Esperando que el anfitrión decida...
     </div>
     {{end}}
 </div>

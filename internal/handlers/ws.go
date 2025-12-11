@@ -510,3 +510,29 @@ func (h *WSHandler) HandleUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	h.broadcastGameState(roomID)
 	w.WriteHeader(http.StatusOK)
 }
+
+func (h *WSHandler) HandleNextRound (w http.ResponseWriter, r *http.Request) {
+	cookie, _ := r.Cookie("player_id")
+	parts := strings.Split(cookie.Value, ":")
+	playerID := parts[0]
+	roomID := r.URL.Query().Get("roomID")
+
+	room, err := h.Manager.GetRoom(roomID)
+	if err != nil {
+		http.Error(w, "Sala no encontrada", http.StatusNotFound)
+		return
+	}
+
+	isHost := false
+	if p, ok := room.Players[playerID]; ok && p.IsHost {
+		isHost = true
+	}
+	if !isHost {
+		http.Error(w, "Solo el host puede avanzar ronda", http.StatusForbidden)
+		return
+	}
+
+	room.NextRound()
+	h.broadcastGameState(roomID)
+	w.WriteHeader(http.StatusOK)
+}
