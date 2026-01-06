@@ -50,6 +50,7 @@ func (h *GameHandler) render(w http.ResponseWriter, page string, data any) {
 
 	if page == "lobby.html" {
 		files = append(files, "ui/html/partials/lobby/settings.html")
+		files = append(files, "ui/html/partials/lobby/controls.html")
 	}
 
 	tmpl := template.New("base")

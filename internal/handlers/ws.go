@@ -342,7 +342,7 @@ func (h *WSHandler) generateResultsHTML(room *game.Room, myPlayerID string) stri
 
 func (h *WSHandler) generateLobbyHTML(room *game.Room, playerID string) string {
 	// Reutilizamos el archivo lobby.html que ya creamos
-	files := []string{"ui/html/pages/lobby.html","ui/html/partials/lobby/settings.html"}
+	files := []string{"ui/html/pages/lobby.html","ui/html/partials/lobby/settings.html","ui/html/partials/lobby/controls.html"}
 	
 	tmpl, err := template.ParseFiles(files...)
 	if err != nil {
