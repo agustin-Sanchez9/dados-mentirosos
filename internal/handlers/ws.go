@@ -3,6 +3,7 @@ package handlers
 import (
 	"dados-mentirosos/internal/game"
 	"fmt"
+	"bytes"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -98,32 +99,63 @@ func (h *WSHandler) HandleRequest(w http.ResponseWriter, r *http.Request) {
 
 // BroadcastPlayerList genera el HTML de la lista y lo envía a todos en la sala
 func (h *WSHandler) BroadcastPlayerList(roomID string) {
-	room, _ := h.Manager.GetRoom(roomID)
-	
-	// Usamos un buffer para renderizar el HTML a texto
-	
-	var htmlBuilder strings.Builder
+	room, err := h.Manager.GetRoom(roomID)
+	if err != nil {
+		return
+	}
 
-	// Le dice a HTMX: "Busca el elemento con id 'players-list' y reemplazalo"
-	htmlBuilder.WriteString(`<ul id="players-list" hx-swap-oob="true" class="space-y-2">`)
-	
+	var listBuilder strings.Builder
+	listBuilder.WriteString(`<ul id="players-list" hx-swap-oob="true" class="space-y-2 min-h-[100px]">`)
 	for _, p := range room.Players {
 		hostBadge := ""
 		if p.IsHost {
 			hostBadge = "👑"
 		}
-		htmlBuilder.WriteString(fmt.Sprintf(
-			`<li class="bg-slate-700 p-2 rounded flex justify-between">
-				<span>%s %s</span>
-			</li>`, 
+		listBuilder.WriteString(fmt.Sprintf(
+			`<li class="bg-slate-700 p-2 rounded flex justify-between items-center animate-fade-in">
+                <span class="font-bold text-slate-200">%s</span>
+                <span>%s</span>
+            </li>`,
 			p.Name, hostBadge))
 	}
-	htmlBuilder.WriteString("</ul>")
+	listBuilder.WriteString("</ul>")
 
-	// Enviar solo a los clientes de esta sala
-	h.Melody.BroadcastFilter([]byte(htmlBuilder.String()), func(q *melody.Session) bool {
-		return q.MustGet("roomID").(string) == roomID
-	})
+	playersListHTML := listBuilder.String()
+	tmpl, err := template.ParseFiles("ui/html/partials/lobby/controls.html")
+	if err != nil {
+		fmt.Printf("Error parseando controles: %v\n", err)
+		return
+	}
+
+	sessions, _ := h.Melody.Sessions() 
+	for _, s := range sessions {
+		if sID, exists := s.Get("roomID"); !exists || sID.(string) != roomID {
+			continue
+		}
+		pID, exists := s.Get("playerID")
+		if !exists {
+			continue
+		}
+		playerID := pID.(string)
+		isHost := false
+		if p, ok := room.Players[playerID]; ok {
+			isHost = p.IsHost
+		}
+
+		var controlsBuffer bytes.Buffer
+		data := map[string]interface{}{
+			"RoomID": roomID,
+			"IsHost": isHost, 
+		}
+		
+		err := tmpl.ExecuteTemplate(&controlsBuffer, "lobby_controls", data)
+		if err != nil {
+			fmt.Printf("Error exec template: %v\n", err)
+			continue
+		}
+		fullMessage := playersListHTML + "\n" + controlsBuffer.String()
+		s.Write([]byte(fullMessage))
+	}
 }
 
 // StartGameAndBroadcast inicia el juego y notifica a todos con sus tableros únicos
@@ -511,7 +543,7 @@ func (h *WSHandler) HandleUpdateConfig(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *WSHandler) HandleNextRound (w http.ResponseWriter, r *http.Request) {
+func (h *WSHandler) HandleNextRound(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("player_id")
 	parts := strings.Split(cookie.Value, ":")
 	playerID := parts[0]
